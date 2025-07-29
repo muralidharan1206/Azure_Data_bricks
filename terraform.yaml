@@ -1,10 +1,10 @@
 databricks:
   dev2:
     name: "wppit-databricks-sandbox"
-    resource_group_name: "Subash-Test"
+    resource_group_name: "Azure-databricks"
     location: "uksouth"
     sku: "premium"
-    admin_user_email: "muralidharn.m@wpp.com"
+    admin_user_email: "azure010698@gmail.com"
     # access_connectors:
     #   connector1:
     #     name: "dev2-connector1"
