@@ -1,0 +1,24 @@
+databricks:
+  dev2:
+    name: "wppit-databricks-sandbox"
+    resource_group_name: "Subash-Test"
+    location: "uksouth"
+    sku: "premium"
+    admin_user_email: "muralidharn.m@wpp.com"
+    # access_connectors:
+    #   connector1:
+    #     name: "dev2-connector1"
+    #     location: "uksouth"
+    #     resource_group_name: "Subash-Test"
+    #     identity_type: "SystemAssigned"
+    tags:
+      environment: "sandbox"
+      team: "platform"
+    # databricks_vnet_peering:
+    #   peering1:
+    #     name: "wppit-databricks-sandbox-peering"
+    #     resource_group_name: "Subash-Test"
+    #     virtual_network_name: "Vnet"
+    #     remote_virtual_network_id: "/subscriptions/db0b8e0e-a0db-4596-8cd7-ff7519bd2ba1/resourceGroups/Karthick-POC/providers/Microsoft.Network/virtualNetworks/test-vm-vnet"
+    #     remote_address_space_prefixes:
+    #       - "10.5.0.0/16"

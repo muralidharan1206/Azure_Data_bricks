@@ -1,0 +1,1 @@
+yaml_config = "./terraform.yaml" # Path to the YAML configuration file
