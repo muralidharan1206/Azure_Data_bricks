@@ -8,17 +8,3 @@ terraform {
     }
   }
 }
-
-provider "azurerm" {
-  features {}
-  subscription_id = ""
-}
-
-provider "databricks" {
-
-}
-
-provider "databricks" {
-  alias = "ws"
-  host  = ""
-}
