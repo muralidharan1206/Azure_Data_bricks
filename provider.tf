@@ -4,7 +4,19 @@ terraform {
       source = "hashicorp/azurerm"
     }
     databricks = {
-      source = "databricks/databricks"
+      source  = "databricks/databricks"
+      version = "=1.85.0"
     }
   }
+}
+
+provider "azurerm" {
+  features {}
+  subscription_id = "71c0a5c7-51ff-46d8-8142-ebb7e2e78dc1"
+
+}
+
+provider "databricks" {
+  alias = "ws"
+  host  = "https://adb-462576349132917.17.azuredatabricks.net"
 }
