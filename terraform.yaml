@@ -21,7 +21,6 @@ databricks:
         allow_instance_pool_create: false
         databricks_sql_access: true
         disable_as_user_deletion: false
-    admin_user_email: "azure010698@gmail.com"
     # access_connectors:
     #   connector1:
     #     name: "dev2-connector1"
