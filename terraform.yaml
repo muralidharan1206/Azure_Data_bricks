@@ -4,6 +4,23 @@ databricks:
     resource_group_name: "Azure-databricks"
     location: "uksouth"
     sku: "premium"
+    admin_users:
+      user1:
+        user_name: "Alexander.PratheepM@wpp.com"
+        display_name: "Alexander Pratheep M"
+        workspace_access: true
+        allow_cluster_create: true
+        allow_instance_pool_create: false
+        databricks_sql_access: true
+        disable_as_user_deletion: false
+    admin_groups:
+      group1:
+        display_name: "grp-WPPITCloudHub-PlatformAzureEngineering"
+        workspace_access: true
+        allow_cluster_create: true
+        allow_instance_pool_create: false
+        databricks_sql_access: true
+        disable_as_user_deletion: false
     admin_user_email: "azure010698@gmail.com"
     # access_connectors:
     #   connector1:
