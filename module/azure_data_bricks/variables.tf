@@ -225,11 +225,28 @@ variable "vnet_peerings" {
 }
 
 #variables for workspace admin
-variable "admin_user_email" {
-  type        = string
-  description = "Email of the user to be assigned as workspace admin"
+variable "admin_users" {
+  description = "Map of Databricks admin users and their SCIM properties"
+  type = map(object({
+    user_name                  = string
+    display_name               = optional(string)
+    workspace_access           = optional(bool, true)
+    workspace_consume          = optional(bool, true)
+    allow_cluster_create       = optional(bool, false)
+    allow_instance_pool_create = optional(bool, false)
+    databricks_sql_access      = optional(bool, true)
+    disable_as_user_deletion   = optional(bool, false)
+  }))
 }
-# variable "aad_group_name" {
-#   type        = string
-#   description = "Azure AD group to assign as workspace admin"
-# }
+
+variable "admin_groups" {
+  description = "Map of Databricks admin groups and their SCIM properties"
+  type = map(object({
+    display_name               = string
+    allow_cluster_create       = optional(bool, false)
+    allow_instance_pool_create = optional(bool, false)
+    databricks_sql_access      = optional(bool, true)
+    disable_as_user_deletion   = optional(bool, false)
+    workspace_access           = optional(bool, true)
+  }))
+}
