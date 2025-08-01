@@ -123,65 +123,27 @@ resource "azurerm_virtual_network_peering" "vnet_peering" {
   allow_virtual_network_access = try(each.value.allow_virtual_network_access, true)
 }
 
-# Create Databricks admin user and assign workspace admin role
-# resource "databricks_user" "admin_user" {
-#   #provider  = databricks.ws
-#   #count     = var.admin_user_email != null ? 1 : 0
-#   user_name = var.admin_user_email
-#   force     = true
-# }
-
-# resource "databricks_user_role" "my_user_role" {
-#   #count   = var.admin_user_email != null ? 1 : 0
-#   user_id = databricks_user.admin_user.id
-#   role    = "workspace-admin"
-# }
-
 resource "databricks_user" "admin_user" {
-  count     = var.admin_user_email != null ? 1 : 0
-  user_name = var.admin_user_email
-  force     = true
+  for_each = var.admin_users != null && length(var.admin_users) > 0 ? var.admin_users : {}
+
+  user_name        = each.value.user_name
+  display_name     = each.value.display_name
+  workspace_access = each.value.workspace_access
+  #workspace_consume          = each.value.workspace_consume
+  allow_cluster_create       = each.value.allow_cluster_create
+  allow_instance_pool_create = each.value.allow_instance_pool_create
+  databricks_sql_access      = each.value.databricks_sql_access
+  disable_as_user_deletion   = each.value.disable_as_user_deletion
+  force                      = true
 }
 
-data "databricks_group" "admins" {
-  display_name = "admins"
+resource "databricks_group" "admin_group" {
+  for_each                   = var.admin_groups != null && length(var.admin_groups) > 0 ? var.admin_groups : {}
+  display_name               = each.value.display_name
+  allow_cluster_create       = each.value.allow_cluster_create
+  allow_instance_pool_create = each.value.allow_instance_pool_create
+  databricks_sql_access      = each.value.databricks_sql_access
+  workspace_access           = each.value.workspace_access
+  #disable_as_user_deletion   = each.value.disable_as_user_deletion
+  force = true
 }
-
-resource "databricks_group_member" "add_user_to_admins" {
-  count     = var.admin_user_email != null ? 1 : 0
-  group_id  = data.databricks_group.admins.id
-  member_id = databricks_user.admin_user[0].id
-}
-
-resource "databricks_user_role" "workspace_admin" {
-  count   = var.admin_user_email != null ? 1 : 0
-  user_id = databricks_user.admin_user[0].id
-  role    = "workspace-admin"
-}
-
-# resource "databricks_group_role" "workspace_admin" {
-#   count    = var.admin_user_email != null ? 1 : 0
-#   group_id = data.databricks_group.admins.id
-#   role     = "workspace-admin"
-# }
-
-# resource "databricks_group_role" "workspace_admin" {
-#   #provider = databricks.ws
-#   count    = var.aad_group_name != null ? 1 : 0
-#   group_id = databricks_group.aad_admin_group[0].id
-#   role     = "workspace-admin"
-# }
-
-# # Create Azure AD group and assign workspace admin role
-# resource "databricks_group" "aad_admin_group" {
-#   #provider     = databricks.ws
-#   count        = var.aad_group_name != null ? 1 : 0
-#   display_name = var.aad_group_name # Must match Azure AD group name synced to workspace
-# }
-
-# resource "databricks_group_role" "aad_group_workspace_admin" {
-#   #provider = databricks.ws
-#   count    = var.aad_group_name != null ? 1 : 0
-#   group_id = databricks_group.aad_admin_group[0].id
-#   role     = "workspace-admin"
-# }
