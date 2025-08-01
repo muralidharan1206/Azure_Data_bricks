@@ -1,5 +1,5 @@
 module "databricks" {
-  source                  = "./azure_data_bricks"
+  source                  = "./module/databricks"
   for_each                = local.databricks
   name                    = each.value.name
   resource_group_name     = each.value.resource_group_name
@@ -10,7 +10,8 @@ module "databricks" {
   databricks_vnet_peering = try(each.value.databricks_vnet_peering, {})
   vnet_peerings           = try(each.value.vnet_peerings, {})
   access_connectors       = try(each.value.access_connectors, {})
-  admin_user_email        = try(each.value.admin_user_email, null)
+  admin_users             = try(each.value.admin_users, null)
+  admin_groups            = try(each.value.admin_groups, null)
   # aad_group_name          = try(each.value.aad_group_name, null)
   providers = {
     databricks = databricks.ws
