@@ -1,40 +1,42 @@
 databricks:
   dev2:
-    name: "wppit-databricks-sandbox"
-    resource_group_name: "Azure-databricks"
-    location: "uksouth"
-    sku: "premium"
+    workspace_config:
+      name: "wppit-databricks-sandbox"
+      resource_group_name: "Azure-databricks"
+      location: "uksouth"
+      sku: "premium"
+      tags:
+        environment: "sandbox"
+        team: "platform"
+    cluster_config:
+      cluster_name: "shared-compute"
+      use_dynamic_cluster_settings: true
+      # spark_version: "13.3.x-scala2.12"
+      # node_type_id: "Standard_DS3_v2"
+      driver_node_type_id: "Standard_DS3_v2"
+      autotermination_minutes: 60
+      enable_elastic_disk: true
+      runtime_engine: "STANDARD"
+      num_workers: 2
+      enable_autoscale: false
+      custom_tags:
+        team: "data-platform"
+      libraries:
+        - pypi_package: "numpy"
+        - jar: "dbfs:/libs/my-lib.jar"
+        - maven_coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.17"
     admin_users:
       user1:
-        user_name: "Alexander.PratheepM@wpp.com"
-        display_name: "Alexander Pratheep M"
+        user_name: "azure010698@gmail.com"
+        display_name: "Azure"
         workspace_access: true
         allow_cluster_create: true
         allow_instance_pool_create: false
         databricks_sql_access: true
         disable_as_user_deletion: false
-    admin_groups:
-      group1:
-        display_name: "grp-WPPITCloudHub-PlatformAzureEngineering"
-        workspace_access: true
-        allow_cluster_create: true
-        allow_instance_pool_create: false
-        databricks_sql_access: true
-        disable_as_user_deletion: false
-    # access_connectors:
-    #   connector1:
-    #     name: "dev2-connector1"
-    #     location: "uksouth"
-    #     resource_group_name: "Subash-Test"
-    #     identity_type: "SystemAssigned"
-    tags:
-      environment: "sandbox"
-      team: "platform"
-    # databricks_vnet_peering:
-    #   peering1:
-    #     name: "wppit-databricks-sandbox-peering"
-    #     resource_group_name: "Subash-Test"
-    #     virtual_network_name: "Vnet"
-    #     remote_virtual_network_id: "/subscriptions/db0b8e0e-a0db-4596-8cd7-ff7519bd2ba1/resourceGroups/Karthick-POC/providers/Microsoft.Network/virtualNetworks/test-vm-vnet"
-    #     remote_address_space_prefixes:
-    #       - "10.5.0.0/16"
+    access_connectors:
+      connector1:
+        name: "dev2-connector1"
+        location: "uksouth"
+        resource_group_name: "Azure-databricks"
+        identity_type: "SystemAssigned"

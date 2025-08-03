@@ -1,47 +1,43 @@
 resource "azurerm_databricks_workspace" "databricks" {
-  name                                                = var.name
-  resource_group_name                                 = var.resource_group_name
-  location                                            = var.location
-  sku                                                 = var.sku
-  managed_resource_group_name                         = var.managed_resource_group_name
-  tags                                                = var.tags
-  public_network_access_enabled                       = var.public_network_access_enabled
+  name                                                = local.name
+  resource_group_name                                 = local.resource_group_name
+  location                                            = local.location
+  sku                                                 = local.sku
+  managed_resource_group_name                         = "${local.name}-managed-rg"
+  tags                                                = local.tags
+  public_network_access_enabled                       = local.public_network_access_enabled
   infrastructure_encryption_enabled                   = local.use_infrastructure_encryption_enabled
   customer_managed_key_enabled                        = local.use_customer_managed_key_enabled
   access_connector_id                                 = local.use_access_connector_id
   default_storage_firewall_enabled                    = local.use_default_storage_firewall_enabled
   network_security_group_rules_required               = local.use_network_security_group_rules_required
-  managed_services_cmk_key_vault_id                   = var.managed_services_cmk_key_vault_id
-  managed_disk_cmk_key_vault_id                       = var.managed_disk_cmk_key_vault_id
+  managed_services_cmk_key_vault_id                   = local.managed_services_cmk_key_vault_id
+  managed_disk_cmk_key_vault_id                       = local.managed_disk_cmk_key_vault_id
   managed_services_cmk_key_vault_key_id               = local.use_managed_services_cmk_key_vault_key_id
   managed_disk_cmk_key_vault_key_id                   = local.use_managed_disk_cmk_key_vault_key_id
   managed_disk_cmk_rotation_to_latest_version_enabled = local.use_managed_disk_cmk_rotation_to_latest_version_enabled
-  load_balancer_backend_address_pool_id               = var.load_balancer_backend_address_pool_id
-  #default_storage_firewall_enabled                    = local.use_default_storage_firewall_enabled
-  #access_connector_id                                 = local.use_access_connector_id
-  # access_connector_id                                = local.use_access_connector_and_firewall.access_connector_id
-  # default_storage_firewall_enabled                   = local.use_access_connector_and_firewall.default_storage_firewall_enabled
+  load_balancer_backend_address_pool_id               = local.load_balancer_backend_address_pool_id
 
   dynamic "custom_parameters" {
-    for_each = var.custom_parameters != null && length(var.custom_parameters) > 0 ? var.custom_parameters : {}
+    for_each = local.custom_parameters
     content {
       machine_learning_workspace_id                        = try(custom_parameters.value.machine_learning_workspace_id, null)
       nat_gateway_name                                     = try(custom_parameters.value.nat_gateway_name, null)
       public_ip_name                                       = try(custom_parameters.value.public_ip_name, null)
       no_public_ip                                         = try(custom_parameters.value.no_public_ip, null)
-      public_subnet_name                                   = try(custom_parameters.value.public_subnet_name, null)                                   #Deploy Azure Databricks workspace in your own Virtual Network (VNet)
-      public_subnet_network_security_group_association_id  = try(custom_parameters.value.public_subnet_network_security_group_association_id, null)  #Deploy Azure Databricks workspace in your own Virtual Network (VNet)
-      private_subnet_name                                  = try(custom_parameters.value.private_subnet_name, null)                                  #Deploy Azure Databricks workspace in your own Virtual Network (VNet)
-      private_subnet_network_security_group_association_id = try(custom_parameters.value.private_subnet_network_security_group_association_id, null) #Deploy Azure Databricks workspace in your own Virtual Network (VNet)
+      public_subnet_name                                   = try(custom_parameters.value.public_subnet_name, null)
+      public_subnet_network_security_group_association_id  = try(custom_parameters.value.public_subnet_network_security_group_association_id, null)
+      private_subnet_name                                  = try(custom_parameters.value.private_subnet_name, null)
+      private_subnet_network_security_group_association_id = try(custom_parameters.value.private_subnet_network_security_group_association_id, null)
       storage_account_name                                 = try(custom_parameters.value.storage_account_name, null)
       storage_account_sku_name                             = try(custom_parameters.value.storage_account_sku_name, null)
-      virtual_network_id                                   = try(custom_parameters.value.virtual_network_id, null)  #Deploy Azure Databricks workspace in your own Virtual Network (VNet)
-      vnet_address_prefix                                  = try(custom_parameters.value.vnet_address_prefix, null) #to use customize CIDR
+      virtual_network_id                                   = try(custom_parameters.value.virtual_network_id, null)
+      vnet_address_prefix                                  = try(custom_parameters.value.vnet_address_prefix, null)
     }
   }
 
   dynamic "enhanced_security_compliance" {
-    for_each = var.sku == "premium" && var.enhanced_security_compliance != null ? [var.enhanced_security_compliance] : []
+    for_each = local.sku == "premium" && local.enhanced_security_compliance != null ? [local.enhanced_security_compliance] : []
     content {
       automatic_cluster_update_enabled      = try(enhanced_security_compliance.value.automatic_cluster_update_enabled, false)
       compliance_security_profile_enabled   = try(enhanced_security_compliance.value.compliance_security_profile_enabled, false)
@@ -51,7 +47,7 @@ resource "azurerm_databricks_workspace" "databricks" {
   }
 
   dynamic "timeouts" {
-    for_each = var.timeouts != null ? [var.timeouts] : []
+    for_each = local.timeouts != null ? [local.timeouts] : []
     content {
       create = try(timeouts.value.create, null)
       read   = try(timeouts.value.read, null)
@@ -65,23 +61,93 @@ resource "azurerm_databricks_workspace" "databricks" {
   ]
 }
 
+resource "databricks_cluster" "this" {
+  cluster_name                 = local.cluster_name
+  spark_version                = local.spark_version
+  node_type_id                 = local.node_type_id
+  driver_node_type_id          = local.driver_node_type_id
+  autotermination_minutes      = local.autotermination_minutes
+  enable_elastic_disk          = local.enable_elastic_disk
+  runtime_engine               = local.runtime_engine
+  spark_conf                   = local.spark_conf
+  custom_tags                  = local.custom_tags
+  data_security_mode           = local.data_security_mode
+  policy_id                    = local.policy_id
+  spark_env_vars               = local.spark_env_vars
+  enable_local_disk_encryption = local.enable_local_disk_encryption
+  instance_pool_id             = local.instance_pool_id
 
-# resource "azurerm_databricks_access_connector" "access_connector" {
-#   for_each = var.access_connectors != null && length(var.access_connectors) > 0 ? var.access_connectors : {}
+  dynamic "autoscale" {
+    for_each = local.enable_autoscale ? [1] : []
+    content {
+      min_workers = local.min_workers
+      max_workers = local.max_workers
+    }
+  }
 
-#   name                = each.value.name
-#   location            = each.value.location
-#   resource_group_name = each.value.resource_group_name
+  num_workers = local.enable_autoscale ? null : local.num_workers
 
-#   identity {
-#     type = each.value.identity_type
-#     identity_ids = (
-#       contains(["UserAssigned", "SystemAssigned, UserAssigned"], each.value.identity_type) && length(each.value.identity_ids) > 0
-#     ) ? each.value.identity_ids : null
-#   }
+  dynamic "library" {
+    for_each = [
+      for lib in local.libraries : lib
+      if length(lib) > 0 && (
+        contains(keys(lib), "jar") ||
+        contains(keys(lib), "egg") ||
+        contains(keys(lib), "whl") ||
+        contains(keys(lib), "maven_coordinates") ||
+        contains(keys(lib), "pypi_package") ||
+        contains(keys(lib), "cran_package")
+      )
+    ]
+    content {
+      jar = try(library.value.jar, null)
+      egg = try(library.value.egg, null)
+      whl = try(library.value.whl, null)
 
-#   tags = try(each.value.tags, {})
-# }
+      dynamic "maven" {
+        for_each = try(library.value.maven_coordinates, null) != null ? [1] : []
+        content {
+          coordinates = library.value.maven_coordinates
+          exclusions  = try(library.value.maven_exclusions, null)
+        }
+      }
+
+      dynamic "pypi" {
+        for_each = try(library.value.pypi_package, null) != null ? [1] : []
+        content {
+          package = library.value.pypi_package
+          repo    = try(library.value.pypi_repo, null)
+        }
+      }
+
+      dynamic "cran" {
+        for_each = try(library.value.cran_package, null) != null ? [1] : []
+        content {
+          package = library.value.cran_package
+          repo    = try(library.value.cran_repo, null)
+        }
+      }
+    }
+  }
+
+
+  dynamic "init_scripts" {
+    for_each = local.init_scripts
+    content {
+      dbfs {
+        destination = init_scripts.value.dbfs.destination
+      }
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [autoscale, num_workers]
+  }
+
+  depends_on = [
+    azurerm_databricks_workspace.databricks
+  ]
+}
 
 resource "azurerm_databricks_access_connector" "access_connector" {
   for_each = var.access_connectors
@@ -135,6 +201,9 @@ resource "databricks_user" "admin_user" {
   databricks_sql_access      = each.value.databricks_sql_access
   disable_as_user_deletion   = each.value.disable_as_user_deletion
   force                      = true
+  depends_on = [
+    azurerm_databricks_workspace.databricks
+  ]
 }
 
 resource "databricks_group" "admin_group" {
@@ -146,4 +215,7 @@ resource "databricks_group" "admin_group" {
   workspace_access           = each.value.workspace_access
   #disable_as_user_deletion   = each.value.disable_as_user_deletion
   force = true
+  depends_on = [
+    azurerm_databricks_workspace.databricks
+  ]
 }
