@@ -62,13 +62,14 @@ resource "azurerm_databricks_workspace" "databricks" {
 }
 
 resource "databricks_cluster" "this" {
-  cluster_name                 = local.cluster_name
-  spark_version                = local.spark_version
-  node_type_id                 = local.node_type_id
-  driver_node_type_id          = local.driver_node_type_id
-  autotermination_minutes      = local.autotermination_minutes
-  enable_elastic_disk          = local.enable_elastic_disk
-  runtime_engine               = local.runtime_engine
+  count                   = local.create_cluster ? 1 : 0
+  cluster_name            = local.cluster_name
+  spark_version           = local.spark_version
+  node_type_id            = local.node_type_id
+  driver_node_type_id     = local.driver_node_type_id
+  autotermination_minutes = local.autotermination_minutes
+  enable_elastic_disk     = local.enable_elastic_disk
+  #runtime_engine               = local.runtime_engine
   spark_conf                   = local.spark_conf
   custom_tags                  = local.custom_tags
   data_security_mode           = local.data_security_mode
@@ -199,10 +200,22 @@ resource "databricks_user" "admin_user" {
   allow_cluster_create       = each.value.allow_cluster_create
   allow_instance_pool_create = each.value.allow_instance_pool_create
   databricks_sql_access      = each.value.databricks_sql_access
-  disable_as_user_deletion   = each.value.disable_as_user_deletion
-  force                      = true
+  #disable_as_user_deletion   = each.value.disable_as_user_deletion
+  force = true
   depends_on = [
     azurerm_databricks_workspace.databricks
+  ]
+}
+
+resource "databricks_group_member" "workspace_admin_membership" {
+  for_each = var.assign_workspace_admin && local.admin_group_id != null ? databricks_user.admin_user : {}
+
+  group_id  = local.admin_group_id
+  member_id = each.value.id
+
+  depends_on = [
+    databricks_user.admin_user,
+    data.databricks_group.admins
   ]
 }
 
