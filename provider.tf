@@ -16,5 +16,5 @@ provider "azurerm" {
 
 provider "databricks" {
   alias = "dev2"
-  host  = module.databricks["dev2"].workspace_url
+  host  = try(module.databricks["dev2"].workspace_url, null)
 }
