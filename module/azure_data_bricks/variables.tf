@@ -5,18 +5,16 @@ variable "workspace_config" {
 }
 
 variable "cluster_config" {
-  description = "All configuration values for the Databricks cluster."
+  description = "Cluster configuration"
   type        = any
-  default     = {}
+  default     = null
 }
 
 variable "admin_users" {
-  description = "Map of Databricks admin users and their SCIM properties."
   type = map(object({
     user_name                  = string
     display_name               = optional(string)
     workspace_access           = optional(bool, true)
-    workspace_consume          = optional(bool, true)
     allow_cluster_create       = optional(bool, false)
     allow_instance_pool_create = optional(bool, false)
     databricks_sql_access      = optional(bool, true)
@@ -24,6 +22,7 @@ variable "admin_users" {
   }))
   default = {}
 }
+
 
 variable "admin_groups" {
   description = "Map of Databricks admin groups and their SCIM properties."
@@ -78,6 +77,12 @@ variable "vnet_peerings" {
   default = {}
 }
 
+variable "assign_workspace_admin" {
+  description = "Whether to assign admin users to the workspace 'admins' group"
+  type        = bool
+  default     = false
+}
+
 # variable "workspace_url" {
 #   type    = string
 #   default = null
@@ -86,4 +91,3 @@ variable "vnet_peerings" {
 #     error_message = "workspace_url must be provided if users, groups, or clusters are being created."
 #   }
 # }
-
