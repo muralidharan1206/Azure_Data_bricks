@@ -1,42 +1,55 @@
 databricks:
   dev2:
+    enabled: false  # Optional: Helps you toggle the module with for_each filtering
+    # assign_workspace_admin: true  # Scoped to this specific workspace
     workspace_config:
       name: "wppit-databricks-sandbox"
-      resource_group_name: "Azure-databricks"
+      resource_group_name: "Subash-Test"
       location: "uksouth"
       sku: "premium"
       tags:
         environment: "sandbox"
         team: "platform"
-    cluster_config:
-      cluster_name: "shared-compute"
-      use_dynamic_cluster_settings: true
-      # spark_version: "13.3.x-scala2.12"
-      # node_type_id: "Standard_DS3_v2"
-      driver_node_type_id: "Standard_DS3_v2"
-      autotermination_minutes: 60
-      enable_elastic_disk: true
-      runtime_engine: "STANDARD"
-      num_workers: 2
-      enable_autoscale: false
-      custom_tags:
-        team: "data-platform"
-      libraries:
-        - pypi_package: "numpy"
-        - jar: "dbfs:/libs/my-lib.jar"
-        - maven_coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.17"
-    admin_users:
-      user1:
-        user_name: "azure010698@gmail.com"
-        display_name: "Azure"
-        workspace_access: true
-        allow_cluster_create: true
-        allow_instance_pool_create: false
-        databricks_sql_access: true
-        disable_as_user_deletion: false
+
+    # cluster_config:
+    #   use_dynamic_cluster_settings: false
+    #   cluster_name: "shared-compute"
+    #   spark_version: "13.3.x-scala2.12"       # Will be ignored if use_dynamic_cluster_settings is true
+    #   node_type_id: "Standard_DS3_v2"         # Will be ignored if use_dynamic_cluster_settings is true
+    #   driver_node_type_id: "Standard_DS3_v2"
+    #   autotermination_minutes: 60
+    #   enable_elastic_disk: true
+    #   runtime_engine: "STANDARD"
+    #   num_workers: 2
+    #   enable_autoscale: false
+    #   custom_tags:
+    #     team: "data-platform"
+    #   libraries:
+    #     - pypi_package: "numpy"
+    #     - maven_coordinates: "com.microsoft.azure:azure-eventhubs-spark_2.12:2.3.17"
+    #   init_scripts: []  # Optional: Add your DBFS scripts if needed
+
+    # admin_users:
+    #   user1:
+    #     user_name: "Alexander.PratheepM@wpp.com"
+    #     display_name: "Alexander Pratheep M"
+    #     workspace_access: true
+    #     allow_cluster_create: true
+    #     allow_instance_pool_create: false
+    #     databricks_sql_access: true
+    #     disable_as_user_deletion: false
+    #   user2:
+    #     user_name: "Muralidharan.M@wpp.com"
+    #     display_name: "Muralidharan M"
+    #     workspace_access: true
+    #     allow_cluster_create: true
+    #     allow_instance_pool_create: false
+    #     databricks_sql_access: true
+    #     disable_as_user_deletion: false
+
     access_connectors:
       connector1:
         name: "dev2-connector1"
         location: "uksouth"
-        resource_group_name: "Azure-databricks"
+        resource_group_name: "Subash-Test"
         identity_type: "SystemAssigned"
