@@ -43,11 +43,16 @@ locals {
   ) ? true : null
 }
 
+locals {
+  create_cluster = var.cluster_config != null && try(length(keys(var.cluster_config)) > 0, false)
+}
+
 # Cluster unpacking
 locals {
   cluster_name                 = try(var.cluster_config.cluster_name, null)
-  spark_version                = try(var.cluster_config.use_dynamic_cluster_settings, false) ? data.databricks_spark_version.latest.id : try(var.cluster_config.spark_version, null)
-  node_type_id                 = try(var.cluster_config.use_dynamic_cluster_settings, false) ? data.databricks_node_type.general_purpose.id : try(var.cluster_config.node_type_id, null)
+  use_dynamic_cluster_settings = try(var.cluster_config.use_dynamic_cluster_settings, false)
+  spark_version                = local.use_dynamic_cluster_settings && length(data.databricks_spark_version.latest) > 0 ? data.databricks_spark_version.latest[0].id : try(var.cluster_config.spark_version, null)
+  node_type_id                 = local.use_dynamic_cluster_settings && length(data.databricks_node_type.general_purpose) > 0 ? data.databricks_node_type.general_purpose[0].id : try(var.cluster_config.node_type_id, null)
   driver_node_type_id          = try(var.cluster_config.driver_node_type_id, null)
   autotermination_minutes      = try(var.cluster_config.autotermination_minutes, 30)
   enable_elastic_disk          = try(var.cluster_config.enable_elastic_disk, true)
@@ -65,4 +70,8 @@ locals {
   num_workers                  = try(var.cluster_config.num_workers, 1)
   libraries                    = try(var.cluster_config.libraries, [])
   init_scripts                 = try(var.cluster_config.init_scripts, [])
+}
+
+locals {
+  admin_group_id = var.assign_workspace_admin ? data.databricks_group.admins.id : null
 }
